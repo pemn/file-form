@@ -14,11 +14,10 @@ http://www.apache.org/licenses/LICENSE-2.0
 https://github.com/pemn/file-form
 */
 
-// Base url to where the remote apps are located
-// complete url will be: base + name + .html
-var sBaseUrl = "http://recursos01/sitepages/";
-// Path to folder where the nwjs runtime is available
-var sSourceDir = "\\\\recursos01\\html$\\libs\\";
+// UNC path to folder where the nwjs runtime is available
+// only required when running on executable mode (most common case)
+// Ex.: \\\\mywindowserver\\share1\\nwruntime
+var sSourceDir = "";
 // Filename of the nwjs runtime. It should be a zip file containing a single folder with the same name.
 var sSourceZip = "nwjs-win-x64";
 
@@ -28,23 +27,32 @@ var sTargetDir = ws.SpecialFolders("APPDATA");
 var sBaseName = fso.GetBaseName(WScript.ScriptName);
 var sBaseDir = fso.GetParentFolderName(WScript.ScriptFullName);
 
-// compiles the command line
-var sRun = sTargetDir + "\\" + sSourceZip + '\\nw.exe';
-if (fso.FileExists(sBaseDir + "\\" + sBaseName + ".html")) {
-  // local mode, where we call the current folder regardless of script name
-  sRun += ' --nwapp=' + fso.GetParentFolderName(WScript.ScriptFullName);
-} else {
-  // remote mode, where we call a remote file with same name as this script
-  sRun += ' --url=' + sBaseUrl + sBaseName + ".html";
+// check if this folder is a valid nwjs app
+if (! fso.FileExists(sBaseDir + "\\package.json")) {
+  WScript.Echo("package.json not found");
+  WScript.Quit(1);
 }
+
+// convert the empty default to a actual path
+if (sSourceDir.length == 0) {
+  sSourceDir = sBaseDir;
+}
+
+// compiles the command line
+var sRun = sTargetDir + "\\" + sSourceZip + '\\nw.exe --nwapp=' + fso.GetParentFolderName(WScript.ScriptFullName);
 
 // check if the nwjs runtime is already present on this machine
 if (! fso.FolderExists(sTargetDir + "\\" + sSourceZip)) {
+  var sSourceFullPath = sSourceDir + "\\" + sSourceZip + ".zip"
+  if (! fso.FileExists(sSourceFullPath)) {
+    WScript.Echo(sSourceFullPath + " not found");
+    WScript.Quit(1);
+  }
   // Create the required Shell objects
   var sa = WScript.CreateObject("Shell.Application");
 
   // Create a reference to the files and folders in the ZIP file
-  var objSource = sa.NameSpace(sSourceDir + sSourceZip + ".zip").Items();
+  var objSource = sa.NameSpace(sSourceFullPath).Items();
 
   // Create a reference to the target folder
   var objTarget = sa.NameSpace(sTargetDir);
