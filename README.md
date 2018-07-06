@@ -24,8 +24,8 @@ The client is a html5 single page application, with two modes of operation:
 Extract the files provided in runtime.7z directly on same folder as the package.* files.
 The system should work, but using the default "everything on the same folder" mode.  
 Now you can start to enable some convenience options:
- - Edit the form fields: Edit the `package.csv` file.
- - Edit the path to the runtime zip in `package.js`: More details are provided there as comments.
+ - Edit the form fields in the `package.csv` file.
+ - Edit the path to the runtime zip in `package.js`. More details are provided there as comments.
  - Custom libs folder: default is the current folder. Add a "libs" setting to `package.json` with a URL.
  - Custom save folder: default is the current folder. Add a `save` setting to `package.json` with a UNC path.
 
@@ -36,4 +36,5 @@ For each column, a field will be generated on the form. There are only two type 
  - File fields. Only the column name, without any options.
 Each field type is determined based only whether there is a list of options below the header. So, even if you need a text field without any options you need to put at least one item. A good convention in this case is a dash `-`.
 
-
+## License
+Apache 2.0
