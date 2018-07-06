@@ -20,3 +20,15 @@ The client is a html5 single page application, with two modes of operation:
 ## Screenshot
 ![screenshot](https://github.com/pemn/file-form/blob/master/assets/screenshot1.png)
 
+## How to use
+First, you need to edit two constants in the following file:
+ - package.js
+More details in the actual file comments.
+Now the system should be working. Now you can start to enable some convenience options:
+ - Edit the form fields: Edit the package.csv file.
+ - Custom save folder: default is the current folder. Add a `save` setting to `package.json` with a UNC path.
+ - Custom libs folder: default is the current folder. Add a "libs" setting to `package.json` with a URL.
+ 
+## Field CSV specification
+For each column, a field will be generated on the form. THere are only 
+
