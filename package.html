@@ -60,13 +60,14 @@ https://github.com/pemn/file-form
       var app = angular.module('app', ['ngFileUpload', 'ngApisp']);
       // controller
       app.controller('MainCtrl', function($scope, $document, $timeout, apisp) {
-        $scope.info = "html5-form v1.0 06/2018 paulo.ernesto";
+        $scope.info = "file-form v1.0 06/2018 paulo.ernesto";
+        $scope.logo = "logo_os.svg";
         $scope.done = false;
         $scope.libs = libs;
         $scope.meta = [];
         $scope.pick = [];
         $scope.data = [];
-        $scope.user = "process" in window ? process.env["USERNAME"] : Date.now();
+        $scope.user = Date.now();
         $scope.name = location.pathname.replace(/.*\/|\.[^.]*$/g, '');
         $scope.form = $scope.name + ".csv";
         // checking for manifest is overkill, since only global is enough in most cases
@@ -74,6 +75,10 @@ https://github.com/pemn/file-form
         $scope.nwjs = "nw" in window;
         if ($scope.nwjs) {
           $scope.name = global.manifest.name;
+          $scope.user = process.env["USERNAME"];
+          if (process.env["USERDOMAIN"] == "VALENETx") {
+            $scope.logo = "logo_valenet.svg";
+          }
           if (global.manifest.hasOwnProperty("form")) {
             $scope.form = global.manifest.form;
           }
@@ -148,7 +153,7 @@ https://github.com/pemn/file-form
     </script>
   </head>
   <body ng-controller="MainCtrl">
-    <img ng-src="{{libs + 'vale_logo_only.svg'}}" title="{{info}}" onclick="alert(this.title)" height=40>
+    <img ng-src="{{libs + logo}}" title="{{info}}" onclick="alert(this.title)" height=40>
     <div class="container">
       <h3 class="text-center">{{name}}</h3>
       <form ng-submit="submitForm()" ng-switch="done">

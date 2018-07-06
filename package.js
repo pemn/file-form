@@ -16,10 +16,9 @@ https://github.com/pemn/file-form
 
 // Base url to where the remote apps are located
 // complete url will be: base + name + .html
-var sBaseUrl = "http://collaboration.valepub.net/groups/gelpf/SitePages/";
+var sBaseUrl = "http://recursos01/sitepages/";
 // Path to folder where the nwjs runtime is available
 var sSourceDir = "\\\\recursos01\\html$\\libs\\";
-//var sSourceDir = "\\\\collaboration.valepub.net\\DavWWWRoot\\groups\\gelpf\\libs\\";
 // Filename of the nwjs runtime. It should be a zip file containing a single folder with the same name.
 var sSourceZip = "nwjs-win-x64";
 

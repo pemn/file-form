@@ -1,7 +1,7 @@
 dir,site,type,year,period,details,triangulations,shapes
-DIPF,ABO,topography,2018,jan,"-"
-DIFN,BRU,pit,,feb
-DIFS,CFJ,polygonal,,mar
+DIPF,ABO,topography,2017,jan,"-"
+DIFN,BRU,pit,2018,feb
+DIFS,CFJ,polygonal,2019,mar
 DIFL,CMT,,,apr
 ,MMI,,,may
 ,,,,jun
