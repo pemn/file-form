@@ -1,0 +1,13 @@
+// nwjs package descriptor
+{
+  "name": "HTML5_Form_Example",
+  "libs": "http://recursos01/libs/",
+  "main": "package.html",
+  "window": {
+    "fullscreen": false,
+    "frame": true,
+    "transparent": false,
+    "always_on_top": false,
+    "toolbar": false
+  }
+}

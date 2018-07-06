@@ -1,0 +1,188 @@
+<!doctype html>
+<!--
+Copyright 2018 Vale
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+*** You can contribute to the main repository at: ***
+
+https://github.com/pemn/file-form
+-->
+<html ng-app="app">
+  <head>
+    <style type="text/css" media="screen">
+      img[onclick] {
+          position: fixed;
+          top: 0;
+          right: 0;
+          margin: 2px;
+      }
+      img[onclick]:hover {
+          animation: shake 0.5s;
+      }
+      @keyframes shake {
+          0% { transform: translate(1px, 1px) rotate(0deg); }
+          10% { transform: translate(-1px, -2px) rotate(-1deg); }
+          20% { transform: translate(-3px, 0px) rotate(1deg); }
+          30% { transform: translate(3px, 2px) rotate(0deg); }
+          40% { transform: translate(1px, -1px) rotate(1deg); }
+          50% { transform: translate(-1px, 2px) rotate(-1deg); }
+          60% { transform: translate(-3px, 1px) rotate(0deg); }
+          70% { transform: translate(3px, 1px) rotate(-1deg); }
+          80% { transform: translate(-1px, -1px) rotate(1deg); }
+          90% { transform: translate(1px, 2px) rotate(0deg); }
+          100% { transform: translate(1px, -2px) rotate(-1deg); }
+      }
+    </style>
+    <script>
+      // conditional load of libraries to allow nwjs specify a remote repository
+      var libs = "libs/";
+      if ("global" in window && global.manifest.libs) {
+        libs = global.manifest.libs;
+      }
+      document.writeln('<link rel="shortcut icon" type="image/ico" href="' + libs + 'favicon.ico"/>');
+      document.writeln('<link type="text/css" rel="stylesheet" href="' + libs + 'bootstrap/css/bootstrap.css" />');
+      document.writeln('<link type="text/css" rel="stylesheet" href="' + libs + 'bootstrap/css/bootstrap-theme.css" />');
+
+      document.writeln('<script src=\"' + libs + 'angular/angular.js"><\/script>');
+      document.writeln('<script src=\"' + libs + 'angular/bootstrap/ui-bootstrap-tpls.js"><\/script>');
+      document.writeln('<script src=\"' + libs + 'angular/ng-file-upload/ng-file-upload.js"><\/script>');
+      document.writeln('<script src=\"' + libs + 'angular/angular-resource.js"><\/script>');
+      document.writeln('<script src=\"' + libs + 'angular-apisp.js"><\/script>');
+      document.writeln('<script src=\"' + libs + 'papaparse/papaparse.js"><\/script>');
+    </script>
+   
+    <script>
+      var app = angular.module('app', ['ngFileUpload', 'ngApisp']);
+      // controller
+      app.controller('MainCtrl', function($scope, $document, $timeout, apisp) {
+        $scope.info = "html5-form v1.0 06/2018 paulo.ernesto";
+        $scope.done = false;
+        $scope.libs = libs;
+        $scope.meta = [];
+        $scope.pick = [];
+        $scope.data = [];
+        $scope.user = "process" in window ? process.env["USERNAME"] : Date.now();
+        $scope.name = location.pathname.replace(/.*\/|\.[^.]*$/g, '');
+        $scope.form = $scope.name + ".csv";
+        // checking for manifest is overkill, since only global is enough in most cases
+        // but global may be defined by modules other than nwjs
+        $scope.nwjs = "nw" in window;
+        if ($scope.nwjs) {
+          $scope.name = global.manifest.name;
+          if (global.manifest.hasOwnProperty("form")) {
+            $scope.form = global.manifest.form;
+          }
+        }
+        // instead of using a csv, the form is defined directly in the package.json
+        if (Array.isArray($scope.form)) {
+          $scope.meta = $scope.form.map(arg => arg[0]);
+          $scope.pick = $scope.form.map(arg => arg.splice(1));
+        } else {
+          // load settings from a csv file
+          Papa.parse($scope.form, {download: true, complete: function(results, file) {
+            $scope.meta = results.data.shift();
+            // transpose the csv table and remove the empty cells
+            $scope.pick = Object.keys($scope.meta)
+              .map(col => results.data.map(row => row[col]).filter(arg => arg));
+            $scope.fitHeight();
+          }});
+        }
+
+        // autofit the window to content
+        $scope.fitHeight = function() {
+          $scope.$digest();
+          resizeTo(outerWidth, document.documentElement.offsetHeight + outerHeight - innerHeight);
+        };
+
+        $scope.submitForm = function(choice){
+          console.log("submitForm");
+          var timestamp = new Date().toISOString().substring(0,10).replace(/-/g,'');
+          var meta_path = $scope.name + "_" + timestamp + ".csv";
+
+          var meta_list = [["label", "value"], ["user", $scope.user], ["time", new Date().toLocaleString()]];
+          for (var i in $scope.meta) {
+            meta_list.push([$scope.meta[i], $scope.data[i]]);
+          }
+          // Node mode
+          if ($scope.nwjs) {
+            const fs = require('fs');
+            // default save path is the current path plus a user folder
+            var save = process.cwd() + "\\" + $scope.user;
+            // check for a custom save path defined on the json
+            if(global.manifest.save) {
+              save = global.manifest.save;
+              meta_path = $scope.user + "_" + meta_path;
+            }
+
+            if (! fs.existsSync(save)) {
+              fs.mkdirSync(save);
+            }
+            for (var i in $scope.meta) {
+              // file selector control
+              if ($scope.pick[i].length == 0 && $scope.data[i]) {
+                for (var j=0;j < $scope.data[i].length; j++) {
+                  var copy_path = save + "\\" + $scope.data[i][j].name;
+                  // copy user selected files
+                  meta_list.push([$scope.meta[i] + "_" + j, copy_path]);
+                  fs.copyFileSync($scope.data[i][j].path, copy_path);
+                }
+              }
+            }
+            // write the metadata file
+            fs.writeFileSync(save + "\\" + meta_path, Papa.unparse(meta_list));
+            $scope.done = true;
+          // http mode
+          } else {
+            apisp.addfile({listname: $scope.name, filename: meta_path}, Papa.unparse(meta_list), function(result) {
+                console.log(result);
+                $scope.done = true;
+              });
+          }
+        };
+      });
+    </script>
+  </head>
+  <body ng-controller="MainCtrl">
+    <img ng-src="{{libs + 'vale_logo_only.svg'}}" title="{{info}}" onclick="alert(this.title)" height=40>
+    <div class="container">
+      <h3 class="text-center">{{name}}</h3>
+      <form ng-submit="submitForm()" ng-switch="done">
+        <div class="alert alert-success text-center" ng-switch-when="true">
+          <h2>Form submited</h2>
+        </div>
+        <table class="table table-bordered table-striped table-hover" ng-switch-default>
+          <thead>
+            <tr>
+              <th>label</th>
+              <th>value</th>
+              <th><input type="submit" class="btn btn-success form-control"></th>
+            </tr>
+          </thead>
+          <tr ng-repeat="(k, v) in meta">
+            <td>{{v}}</td>
+            <td ng-if="pick[k].length || ! nwjs">
+              <input type="text" class="form-control" list="list_{{k}}" ng-model="data[k]">
+              <datalist id="list_{{k}}">
+                <option ng-repeat="item in pick[k]" ng-value="item"/>
+              </datalist>
+            </td>
+            <td ng-if="pick[k].length == 0 && nwjs">
+              <input type="button" class="btn btn-default form-control" ngf-select="" ng-model="data[k]" multiple value="Select Files" ng-disabled="! nwjs">
+            </td>
+            <td>
+              <ul ng-if="pick[k].length == 0 && nwjs">
+                <li ng-repeat="item in data[k]">{{item.name}}</li>
+              </ul>
+            </td>
+          </tr>
+        </table>
+      </form>
+      <br/>
+    </div>
+  </body>
+</html>
