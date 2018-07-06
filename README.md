@@ -7,14 +7,16 @@ The client is a html5 single page application, with two modes of operation:
  - Http mode, where you host the client on a web server, but still without a backend.
 
 ## Features
- - Single click forms links, without any requisite steps by the user.
+ - Single click executable forms links, without any requisite steps by the user.
  - Form fields are defined in a csv file, without requiring any maintenance on the engine code.
  - Easy to deploy in new enviroments. Just copy the entire folder and send the corresponding link.
  - Inputed data is stored as files in a CIFS/SMB share. Default save path is the folder containing the script.
+ - Executable entry point, client and runtime can be used as base for a custom serverless html5 application.
 
 ## Limitations
  - Currently a executable entry point is only available for Windows enviroments (WSH script).
  - In executable mode, requires one or more CIFS/SMB shares to store the script, the results and the nwjs runtime package.
  
-
+## Screenshot
+![screenshot](https://github.com/pemn/file-form/blob/master/assets/screenshot1.png)
 
