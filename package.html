@@ -44,6 +44,7 @@ https://github.com/pemn/file-form
       if ("global" in window && global.manifest.libs) {
         libs = global.manifest.libs;
       }
+      // hardcoded settings for development enviroment
       if (location.hostname == "localhost") {
         libs = "http://recursos01/libs/";
       }
@@ -55,8 +56,9 @@ https://github.com/pemn/file-form
       document.writeln('<script src=\"' + libs + 'angular/bootstrap/ui-bootstrap-tpls.js"><\/script>');
       document.writeln('<script src=\"' + libs + 'angular/ng-file-upload/ng-file-upload.js"><\/script>');
       document.writeln('<script src=\"' + libs + 'angular/angular-resource.js"><\/script>');
-      document.writeln('<script src=\"' + libs + 'angular-apisp.js"><\/script>');
       document.writeln('<script src=\"' + libs + 'papaparse/papaparse.js"><\/script>');
+      // custom backend provider for Web mode
+      document.writeln('<script src=\"' + libs + 'angular-apisp.js"><\/script>');
     </script>
    
     <script>
@@ -157,6 +159,7 @@ https://github.com/pemn/file-form
             $scope.done = true;
           // http mode
           } else {
+            // here you should add a appropriate POST request for your web backend
             apisp.addfile({listname: $scope.name, filename: meta_path}, Papa.unparse(meta_list), function(result) {
                 console.log(result);
                 $scope.done = true;
