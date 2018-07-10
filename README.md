@@ -13,6 +13,7 @@ The client is a html5 single page application, with two modes of operation:
  - Inputed data is stored as files in a CIFS/SMB share. Default save path is the folder containing the script.
  - Executable entry point, client and runtime can be used as base for a custom serverless html5 application.
  - Editable and linkable selection lists.
+ - On executable mode, does not relly on any installed browser using a standalone chromium based runtime.
 
 ## Limitations
  - Currently a executable entry point is only available for Windows enviroments (WSH script).
@@ -29,7 +30,7 @@ Now you can start to enable some convenience options:
  - Edit the path to the runtime zip in `package.js`. More details are provided there as comments.
  - Custom libs folder: default is the current folder. Add a "libs" setting to `package.json` with a URL.
  - Custom save folder: default is the current folder. Add a `save` setting to `package.json` with a UNC path.
-
+ - Optional form definition: instead of using a csv you can hardcode the form in the json `form` setting.
  
 ## Field CSV specification
 For each column, a field will be generated on the form.  
@@ -51,9 +52,9 @@ Supported control types are:
 ## CSV example
 | title | date:date | check:checkbox | attachment:files | color | continent | country:link |
 | --- | --- | --- | --- | --- | --- | --- |
-| | | | | Red | America | America-US |
-| | | | | Green | Australia | America-Canada |
-| | | | | Blue | Africa | Africa-SA |
+| | | | | red | America | America-US |
+| | | | | green | Australia | America-Canada |
+| | | | | blue | Africa | Africa-SA |
 | | | | | | Asia | Asia-China |
 | | | | | | Europe | Asia-Japan |
 | | | | | | | Asia-SK |
@@ -61,7 +62,6 @@ Supported control types are:
 | | | | | | | Australia-Australia |
 | | | | | | | Europe-Germany |
 | | | | | | | Europe-France |
-
 
 ## License
 Apache 2.0
