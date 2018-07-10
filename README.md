@@ -46,15 +46,17 @@ Supported control types are:
  - files
    - Multiple local file system selection. Behavior is very different from standard `<input type="file">`.
  - link
-   - Similar with text, but allows linked options to the previous control.
+   - Similar with text, but allows linked options filtered by the value of the previous control. Ex.: One control to select a country then another control to select one of its cities.
 
 ## CSV example
----
-date:date | check:checkbox | color | continent | country
-
-
-
-
+| date:date | check:checkbox | color | continent | country |
+| --- | --- | --- | --- | --- |
+| | | Red | America | America-US |
+| | | Green | Europe | America-Canada |
+| | | Blue | Asia | Europe-Germany |
+| | | | Africa | Europe-France |
+| | | | Australia | Australia-Australia |
+| | | | | Africa-SA |
 
 
 
