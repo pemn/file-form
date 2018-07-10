@@ -1,7 +1,7 @@
 # file-form
 
 ## Description
-This system is a standalone way to create forms without a http backend. Uses standard CIFS/SMB shares.
+This system is a standalone way to create forms without a http backend. Uses standard CIFS/SMB shares (A.k.a.: Windows Shares).
 The client is a html5 single page application, with two modes of operation:  
  - Executable mode, using a standalone nwjs runtime. This mode supports the copying of local files.
  - Http mode, where you host the client on a web server, but still without a backend.
@@ -12,6 +12,7 @@ The client is a html5 single page application, with two modes of operation:
  - Easy to deploy in new enviroments. Just copy the entire folder and send the corresponding link.
  - Inputed data is stored as files in a CIFS/SMB share. Default save path is the folder containing the script.
  - Executable entry point, client and runtime can be used as base for a custom serverless html5 application.
+ - Editable and linkable selection lists.
 
 ## Limitations
  - Currently a executable entry point is only available for Windows enviroments (WSH script).
@@ -31,10 +32,23 @@ Now you can start to enable some convenience options:
 
  
 ## Field CSV specification
-For each column, a field will be generated on the form. There are only two type of fields:
- - Text fields, with a list of one or more options.
- - File fields. Only the column name, without any options.
-Each field type is determined based only whether there is a list of options below the header. So, even if you need a text field without any options you need to put at least one item. A good convention in this case is a dash `-`.
+For each column, a field will be generated on the form.  
+Below the column header, a list of options may be specified.  
+The default behavior is to create a `<input type="text>` control, plus the list of options as a HTML5 `<datalist>`.  
+Other controls may be specified by using a decorator ":" and the desired field type.  
+Supported control types are:
+ - text
+   - Standard text control with a optional list of options
+ - date
+ - checkbox
+ - files
+ - link
+
+
+
+
+
+
 
 ## License
 Apache 2.0
