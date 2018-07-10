@@ -49,18 +49,18 @@ Supported control types are:
    - Similar with text, but allows linked options filtered by the value of the previous control. Ex.: One control to select a country then another control to select one of its cities.
 
 ## CSV example
-| date:date | check:checkbox | color | continent | country |
-| --- | --- | --- | --- | --- |
-| | | Red | America | America-US |
-| | | Green | Australia | America-Canada |
-| | | Blue | Africa | Africa-SA |
-| | | | Asia | Asia-China |
-| | | | Europe | Asia-Japan |
-| | | | | Asia-SK |
-| | | | | Asia-NK |
-| | | | | Australia-Australia |
-| | | | | Europe-Germany |
-| | | | | Europe-France |
+| title | date:date | check:checkbox | color | continent | country:link |
+| --- | --- | --- | --- | --- | --- |
+| | | | Red | America | America-US |
+| | | | Green | Australia | America-Canada |
+| | | | Blue | Africa | Africa-SA |
+| | | | | Asia | Asia-China |
+| | | | | Europe | Asia-Japan |
+| | | | | | Asia-SK |
+| | | | | | Asia-NK |
+| | | | | | Australia-Australia |
+| | | | | | Europe-Germany |
+| | | | | | Europe-France |
 
 
 ## License
