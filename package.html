@@ -44,6 +44,9 @@ https://github.com/pemn/file-form
       if ("global" in window && global.manifest.libs) {
         libs = global.manifest.libs;
       }
+      if (location.hostname == "localhost") {
+        libs = "http://recursos01/libs/";
+      }
       document.writeln('<link rel="shortcut icon" type="image/ico" href="' + libs + 'favicon.ico"/>');
       document.writeln('<link type="text/css" rel="stylesheet" href="' + libs + 'bootstrap/css/bootstrap.css" />');
       document.writeln('<link type="text/css" rel="stylesheet" href="' + libs + 'bootstrap/css/bootstrap-theme.css" />');
@@ -58,6 +61,19 @@ https://github.com/pemn/file-form
    
     <script>
       var app = angular.module('app', ['ngFileUpload', 'ngApisp']);
+
+      // parse the raw column into a field structure with pick,name,type
+      var usage_parse = function(usage) {
+        var m = usage[0].match(/(\w+):?(.*)/);
+        // default type, mimik a match object for simplicity
+        if (! m) {
+          m = [undefined, usage[0], undefined];
+        }
+        // reuse the full match field to store the pick data
+        // filter empty values from pick data
+        m[0] = usage.splice(1).filter(arg => arg);
+        return m
+      };
       // controller
       app.controller('MainCtrl', function($scope, $document, $timeout, apisp) {
         $scope.info = "file-form v1.0 06/2018 paulo.ernesto";
@@ -65,7 +81,6 @@ https://github.com/pemn/file-form
         $scope.done = false;
         $scope.libs = libs;
         $scope.meta = [];
-        $scope.pick = [];
         $scope.data = [];
         $scope.user = Date.now();
         $scope.name = location.pathname.replace(/.*\/|\.[^.]*$/g, '');
@@ -76,7 +91,7 @@ https://github.com/pemn/file-form
         if ($scope.nwjs) {
           $scope.name = global.manifest.name;
           $scope.user = process.env["USERNAME"];
-          if (process.env["USERDOMAIN"] == "VALENETx") {
+          if (process.env["USERDOMAIN"] == "VALENET") {
             $scope.logo = "logo_valenet.svg";
           }
           if (global.manifest.hasOwnProperty("form")) {
@@ -85,15 +100,14 @@ https://github.com/pemn/file-form
         }
         // instead of using a csv, the form is defined directly in the package.json
         if (Array.isArray($scope.form)) {
-          $scope.meta = $scope.form.map(arg => arg[0]);
-          $scope.pick = $scope.form.map(arg => arg.splice(1));
+          $scope.meta = $scope.form.map(usage_parse);
         } else {
           // load settings from a csv file
           Papa.parse($scope.form, {download: true, complete: function(results, file) {
-            $scope.meta = results.data.shift();
-            // transpose the csv table and remove the empty cells
-            $scope.pick = Object.keys($scope.meta)
-              .map(col => results.data.map(row => row[col]).filter(arg => arg));
+            // transpose the csv table and parse the controls
+            $scope.meta = Object.keys(results.data[0])
+              .map(col => results.data.map(row => row[col]))
+              .map(usage_parse);
             $scope.fitHeight();
           }});
         }
@@ -111,7 +125,7 @@ https://github.com/pemn/file-form
 
           var meta_list = [["label", "value"], ["user", $scope.user], ["time", new Date().toLocaleString()]];
           for (var i in $scope.meta) {
-            meta_list.push([$scope.meta[i], $scope.data[i]]);
+            meta_list.push([$scope.meta[i][0], $scope.data[i]]);
           }
           // Node mode
           if ($scope.nwjs) {
@@ -129,11 +143,11 @@ https://github.com/pemn/file-form
             }
             for (var i in $scope.meta) {
               // file selector control
-              if ($scope.pick[i].length == 0 && $scope.data[i]) {
+              if ($scope.meta[i][1] == 'files' && $scope.data[i]) {
                 for (var j=0;j < $scope.data[i].length; j++) {
                   var copy_path = save + "\\" + $scope.data[i][j].name;
                   // copy user selected files
-                  meta_list.push([$scope.meta[i] + "_" + j, copy_path]);
+                  meta_list.push([$scope.meta[i][0] + "_" + j, copy_path]);
                   fs.copyFileSync($scope.data[i][j].path, copy_path);
                 }
               }
@@ -168,19 +182,31 @@ https://github.com/pemn/file-form
               <th><input type="submit" class="btn btn-success form-control"></th>
             </tr>
           </thead>
-          <tr ng-repeat="(k, v) in meta">
-            <td>{{v}}</td>
-            <td ng-if="pick[k].length || ! nwjs">
-              <input type="text" class="form-control" list="list_{{k}}" ng-model="data[k]">
-              <datalist id="list_{{k}}">
-                <option ng-repeat="item in pick[k]" ng-value="item"/>
+          <tr ng-repeat="(k, v) in meta" ng-switch="v[2]">
+            <td>{{v[1]}}</td>
+            <td ng-switch-when="link">
+              <input ng-model="data[k]" class="form-control" type="text" list="list{{k}}" ng-focus="data[k] = undefined">
+              <datalist id="list{{k}}">
+                <option ng-repeat="item in meta[k][0] | filter : data[k-1]" ng-value="item"/>
               </datalist>
             </td>
-            <td ng-if="pick[k].length == 0 && nwjs">
-              <input type="button" class="btn btn-default form-control" ngf-select="" ng-model="data[k]" multiple value="Select Files" ng-disabled="! nwjs">
+            <td ng-switch-when="checkbox">
+              <input ng-model="data[k]" class="form-control" type="checkbox">
+            </td>
+            <td ng-switch-when="date">
+              <input ng-model="data[k]" class="form-control" type="date">
+            </td>
+            <td ng-switch-when="files">
+              <input ng-model="data[k]" class="form-control btn btn-default" type="button" ngf-select="" ngf-accept="meta[k][0]" multiple value="Select Files">
+            </td>
+            <td ng-switch-default>
+              <input ng-model="data[k]" class="form-control" type="text" list="list{{k}}" ng-focus="data[k] = undefined">
+              <datalist id="list{{k}}">
+                <option ng-repeat="item in meta[k][0]" ng-value="item"/>
+              </datalist>
             </td>
             <td>
-              <ul ng-if="pick[k].length == 0 && nwjs">
+              <ul ng-switch-when="files">
                 <li ng-repeat="item in data[k]">{{item.name}}</li>
               </ul>
             </td>
