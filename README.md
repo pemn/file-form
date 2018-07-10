@@ -39,10 +39,18 @@ Other controls may be specified by using a decorator ":" and the desired field t
 Supported control types are:
  - text
    - Standard text control with a optional list of options
- - date
  - checkbox
+   - Standard checkbox
+ - date
+   - HTML5 date control
  - files
+   - Multiple local file system selection. Behavior is very different from standard `<input type="file">`.
  - link
+   - Similar with text, but allows linked options to the previous control.
+
+## CSV example
+---
+date:date | check:checkbox | color | continent | country
 
 
 
