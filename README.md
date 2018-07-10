@@ -5,7 +5,7 @@ This system is a standalone way to fill forms and copy files without a http back
 The client is a html5 single page application using the angular framework.  
 There are two modes of operation:  
  - Executable mode, using a standalone nwjs runtime. This mode supports the copying of local files.
- - Http mode, where you host the client on a web server, but still without a backend.
+ - Http mode, where you host the client on a web server with a custom REST backend (PHP, Sharepoint, WP, etc).
 
 ## Features
  - Single click executable forms links, without any requisite steps by the user.
@@ -15,7 +15,7 @@ There are two modes of operation:
  - Inputed data is stored as files in a LAN share. Default save path is the folder containing the script.
  - Executable entry point, client and runtime can be used as base for a custom serverless html5 application.
  - Editable and linkable selection lists.
- - On executable mode, does not rely on any installed browser. Uses a standalone chromium based runtime.
+ - On executable mode, does not rely on any installed browser. Uses a standalone chromium based runtime (nwjs).
  - Did i mention no http server required? Yes, thats right.
 
 ## Limitations
@@ -26,7 +26,7 @@ There are two modes of operation:
 ![screenshot](https://github.com/pemn/file-form/blob/master/assets/screenshot1.png)
 
 ## How to use
-Extract the files provided in runtime.7z directly on same folder as the package.* files.
+Extract the files provided in runtime.7z directly on same folder as the package.* files. This is runtime is just a repackaging of the nwjs distribution removing the version number from the zip folder.
 The system should work, but using the default "everything on the same folder" mode.  
 Now you can start to enable some convenience options:
  - Edit the form fields in the `package.csv` file.
