@@ -52,15 +52,15 @@ Supported control types are:
 | date:date | check:checkbox | color | continent | country |
 | --- | --- | --- | --- | --- |
 | | | Red | America | America-US |
-| | | Green | Europe | America-Canada |
-| | | Blue | Asia | Europe-Germany |
-| | | | Africa | Europe-France |
-| | | | Australia | Australia-Australia |
-| | | | | Africa-SA |
-| | | | | Asia-China |
-| | | | | Asia-Japan |
+| | | Green | Australia | America-Canada |
+| | | Blue | Africa | Africa-SA |
+| | | | Asia | Asia-China |
+| | | | Europe | Asia-Japan |
 | | | | | Asia-SK |
 | | | | | Asia-NK |
+| | | | | Australia-Australia |
+| | | | | Europe-Germany |
+| | | | | Europe-France |
 
 
 ## License
