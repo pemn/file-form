@@ -57,7 +57,10 @@ Supported control types are:
 | | | | Africa | Europe-France |
 | | | | Australia | Australia-Australia |
 | | | | | Africa-SA |
-
+| | | | | Asia-China |
+| | | | | Asia-Japan |
+| | | | | Asia-SK |
+| | | | | Asia-NK |
 
 
 ## License
