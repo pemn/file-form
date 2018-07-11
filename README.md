@@ -28,7 +28,7 @@ There are two modes of operation:
 Extract the files provided in runtime.7z directly on same folder as the package.* files ("extract here"). *Do not* extract the file `nwjs-win-x64.zip`, its a packaged runtime required by the system. This file is just a standard nwjs distribution where the internal zip folder was renamed to remove the version number.
 Extract the libs.7z package to a subfolder with the same name (`libs`). Dont "extract here" because this zip does not have a internal folder.  
 The current folder should look like this:  
-![screenshot2](https://github.com/pemn/file-form/blob/master/assets/screenshot2.png)
+![screenshot2](https://github.com/pemn/file-form/blob/master/assets/screenshot2.png)  
 The system should now work, but using the default "everything on the same folder" mode. To run the example form execute `package.js` (a Windows WSH script).  
 To deploy, customize the form as detailed below. Then create a network share to this folder and send to the users which must fill the form a link with the UNC path to the `package.js` file. Ex.: `\\windowsbox001\sharename\package.js`.  
 
