@@ -1,22 +1,21 @@
 # file-form
 
 ## Description
-This system is a standalone way to fill forms and copy files without a http backend. Uses standard CIFS/SMB shares in the local area network (A.k.a.: Windows Shares).
+This system is a standalone, data-driven, way to fill forms and copy files without a http backend. Uses standard CIFS/SMB shares in the local area network (A.k.a.: Windows Shares).
 The client is a html5 single page application using the angular framework.  
 There are two modes of operation:  
- - Executable mode, using a standalone nwjs runtime. This mode supports the copying of local files.
- - Http mode, where you host the client on a web server with a custom REST backend (PHP, Sharepoint, WP, etc).
+ - Executable mode. A custom WSH script calls a standalone nw.js runtime. This mode supports the copying of local files.
+ - Http mode. Hosted on a web server with a custom REST backend (PHP, Sharepoint, WP, etc).
 
 ## Features
- - Single click executable forms links, without any requisite steps by the user.
+ - No HTTP server required in executable mode.
+ - Single click executable forms links, without any setup or dependencies. Works in all Windows versions supported by nw.js.
  - Local file copy. Instead of files being uploaded, they are copied from folder to folder directly by the OS.
- - Form fields may be defined in a csv file, without requiring any maintenance on the engine code.
+ - Data-driven. Form fields may be defined in a csv file, without requiring any maintenance on the engine code.
  - Easy to deploy in new enviroments. Just copy the entire folder and send the corresponding link.
  - Inputed data is stored as files in a LAN share. Default save path is the folder containing the script.
- - Executable entry point, client and runtime can be used as base for a custom serverless html5 application.
- - Editable and linkable selection lists.
- - On executable mode, does not rely on any installed browser. Uses a standalone chromium based runtime (nwjs).
- - Did i mention no http server required? Yes, thats right.
+ - Executable. The client and runtime structure can be used as base for other custom serverless html5 applications.
+ - On executable mode, does not rely on any installed browser. Uses a standalone chromium based runtime (nw.js).
 
 ## Limitations
  - Currently a executable entry point is only available for Windows enviroments (WSH script).
@@ -27,7 +26,10 @@ There are two modes of operation:
 
 ## How to use
 Extract the files provided in runtime.7z directly on same folder as the package.* files. This is runtime is just a repackaging of the nwjs distribution removing the version number from the zip folder.
-The system should work, but using the default "everything on the same folder" mode.  
+Extract the libs.7z package also directly on the same folder. Carefull to not create a additional subfolder (i.e.: libs/libs/).
+The system should now work, but using the default "everything on the same folder" mode.  
+Create a network share to this folder and send to the users which must fill the form a link with the UNC path to the `package.js` file. Ex.: `\\windowsbox001\sharename\package.js`.  
+
 Now you can start to enable some convenience options:
  - Edit the form fields in the `package.csv` file.
  - Edit the path to the runtime zip in `package.js`. More details are provided there as comments.
