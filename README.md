@@ -27,11 +27,10 @@ There are two modes of operation:
 ## How to use
 Extract the files provided in runtime.7z directly on same folder as the package.* files ("extract here"). This is runtime is just a repackaging of the nwjs distribution removing the version number from the zip folder.  
 Extract the libs.7z package to a subfolder with the same name (`libs`). Dont "extract here" because this zip does not have a folder inside.  
-The system should now work, but using the default "everything on the same folder" mode.  
-On Windows, doubleclick on `package.js`.  
-Create a network share to this folder and send to the users which must fill the form a link with the UNC path to the `package.js` file. Ex.: `\\windowsbox001\sharename\package.js`.  
+The system should now work, but using the default "everything on the same folder" mode. To run the example form execute `package.js` (a Windows WSH script).  
+To deploy, customize the form as detailed below. Then create a network share to this folder and send to the users which must fill the form a link with the UNC path to the `package.js` file. Ex.: `\\windowsbox001\sharename\package.js`.  
 
-Now you can start to enable some convenience options:
+## Customize the form
  - Edit the form fields in the `package.csv` file.
  - Edit the path to the runtime zip in `package.js`. More details are provided there as comments.
  - Custom libs folder: default is the current folder. Add a "libs" setting to `package.json` with a URL.
