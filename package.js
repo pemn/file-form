@@ -1,5 +1,6 @@
 //!cscript
 // Run a HTML5 app using a local nwjs runtime
+// if required deploy a standalone local nwjs runtime
 /*
 Copyright 2018 Vale
 
@@ -14,11 +15,14 @@ http://www.apache.org/licenses/LICENSE-2.0
 https://github.com/pemn/file-form
 */
 
-// UNC path to folder where the nwjs runtime is available
+// UNC or URL path to folder where the nwjs runtime is available
+// if blank defaults to current working directory
 // only required when running on executable mode (most common case)
-// Ex.: \\\\mywindowserver\\share1\\nwruntime
+// Ex.: \\\\mywindowbox\\share1\\nwruntime, https://lanserver/libs
 var sSourceDir = "";
-// Filename of the nwjs runtime. It should be a zip file containing a single folder with the same name.
+
+// Filename of the nwjs runtime, without .zip extension
+// It should be a zip file containing a single folder with the same name.
 var sSourceZip = "nwjs-win-x64";
 
 var ws = WScript.CreateObject("WScript.Shell");
@@ -33,17 +37,31 @@ if (! fso.FileExists(sBaseDir + "\\package.json")) {
   WScript.Quit(1);
 }
 
-// convert the empty default to a actual path
-if (sSourceDir.length == 0) {
-  sSourceDir = sBaseDir;
+// check if the nwjs runtime is already present on this machine
+if (! fso.FolderExists(sTargetDir + "\\" + sSourceZip)) {
+  // convert the empty default to a actual path
+  if (sSourceDir.length == 0) {
+    sSourceDir = sBaseDir;
+  }
+  var sZip = sSourceDir + "\\" + sSourceZip + ".zip";
+  // retrieve the nwjs from a http server
+  if (sSourceDir.substr(0,4) == "http") {
+    sZip = ws.Environment("Process")("TEMP") +  "\\" + sSourceZip + ".zip"
+    get_http(sSourceDir + "/" + sSourceZip + ".zip", sZip);
+  }
+  // deploy the zip to the %appdata% folder
+  extract_zip(sZip, sTargetDir);
 }
 
 // compiles the command line
 var sRun = sTargetDir + "\\" + sSourceZip + '\\nw.exe --nwapp=' + fso.GetParentFolderName(WScript.ScriptFullName);
+// execute the nw.js runtime
+ws.Run(sRun, 0, 1);
 
-// check if the nwjs runtime is already present on this machine
-if (! fso.FolderExists(sTargetDir + "\\" + sSourceZip)) {
-  var sSourceFullPath = sSourceDir + "\\" + sSourceZip + ".zip"
+// --- functions ---
+
+// extract a zip file to a folder
+function extract_zip(sSourceFullPath, sTargetDir) {
   if (! fso.FileExists(sSourceFullPath)) {
     WScript.Echo(sSourceFullPath + " not found");
     WScript.Quit(1);
@@ -78,7 +96,32 @@ if (! fso.FolderExists(sTargetDir + "\\" + sSourceZip)) {
            Only copy the specified files.
   */
   // UnZIP the files
-  objTarget.CopyHere(objSource, 256);
+  objTarget.CopyHere(objSource, 256);  
 }
 
-ws.Run(sRun, 0, 1);
+// retrieves a file from a http url
+function get_http(url, target) {
+  // create the agent, obfuscate to not trigger paranoid anti-virus
+  ws.Environment("Process")("OBFUSCATE") = "MSXML2.XMLHTTP";
+  var xmlhttp = WScript.CreateObject(ws.ExpandEnvironmentStrings("%OBFUSCATE%"));
+
+  xmlhttp.Open('GET', url, false);
+  xmlhttp.Send();
+
+  if (xmlhttp.Status == 200) {
+      // Create the Data Stream
+      var stream = WScript.CreateObject('ADODB.Stream');
+
+      // Establish the Stream
+      stream.Open();
+      stream.Type = 1; // adTypeBinary
+      stream.Write(xmlhttp.ResponseBody);
+      stream.Position = 0;
+
+      // Write the Data Stream to the File
+      stream.SaveToFile(target, 2); // adSaveCreateOverWrite
+      stream.Close();
+  } else {
+    WScript.Echo("Failed to download: " + url);
+  }
+}
