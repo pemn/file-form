@@ -40,13 +40,13 @@ https://github.com/pemn/file-form
     </style>
     <script>
       // conditional load of libraries to allow nwjs specify a remote repository
+      // can and should be replace by static includes if the conditional load is not needed
+      
+      // default path is a subfolder in the current location
       var libs = "libs/";
+      // path to the libs folder was defined in the manifest.json
       if ("global" in window && global.manifest.libs) {
         libs = global.manifest.libs;
-      }
-      // hardcoded settings for development enviroment
-      if (location.hostname == "localhost") {
-        libs = "http://recursos01/libs/";
       }
       document.writeln('<link rel="shortcut icon" type="image/ico" href="' + libs + 'favicon.ico"/>');
       document.writeln('<link type="text/css" rel="stylesheet" href="' + libs + 'bootstrap/css/bootstrap.css" />');

@@ -1,7 +1,7 @@
 // nwjs package descriptor
 {
   "name": "File_Form_Example",
-  "libs": "http://recursos01/libs/",
+
   "main": "package.html",
   "window": {
     "fullscreen": false,
