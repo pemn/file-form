@@ -25,7 +25,7 @@ There are two modes of operation:
 ![screenshot1](https://github.com/pemn/file-form/blob/master/assets/screenshot1.png)
 
 ## How to use
-Extract the files provided in runtime.7z directly on same folder as the package.* files ("extract here"). *Do not* extract the file `nwjs-win-x64.zip`, its a packaged runtime required by the system. This file is just a standard nwjs distribution where the internal zip folder was renamed to remove the version number.
+Extract the files provided in nwjs-win-x64.7z.00x directly on same folder as the package.* files ("extract here"). *Do not* extract the file `nwjs-win-x64.zip`, its a packaged runtime required by the system. This file is just a standard nwjs distribution where the internal zip folder was renamed to remove the version number.
 Extract the libs.7z package to a subfolder with the same name (`libs`). Dont "extract here" because this zip does not have a internal folder.  
 The current folder should look like this:  
 ![screenshot2](https://github.com/pemn/file-form/blob/master/assets/screenshot2.png)  
