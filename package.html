@@ -59,14 +59,14 @@ https://github.com/pemn/file-form
       document.writeln('<script src=\"' + libs + 'angular/bootstrap/ui-bootstrap-tpls.js"><\/script>');
       document.writeln('<script src=\"' + libs + 'angular/ng-file-upload/ng-file-upload.js"><\/script>');
       document.writeln('<script src=\"' + libs + 'angular/angular-resource.js"><\/script>');
-      document.writeln('<script src=\"' + libs + 'angular-worker.js"><\/script>');
+      document.writeln('<script src=\"' + libs + 'angular-bale.js"><\/script>');
     </script>
     <script>
-      var app = angular.module('app', ['ngFileUpload', 'ngWorker']);
+      var app = angular.module('app', ['ngFileUpload', 'ngBale']);
 
-      // business logic service, subclassing worker
-      app.service('file_form', function(worker) {
-        var _self = worker;
+      // business logic service, subclassing bale
+      app.service('file_form', function(bale) {
+        var _self = bale;
         _self.form = "package.csv";
         _self.main = function() {
           var meta = _self.meta;
@@ -124,7 +124,7 @@ https://github.com/pemn/file-form
 
       // controller
       app.controller('MainCtrl', function($scope, file_form) {
-        $scope.worker = file_form;
+        $scope.bale = file_form;
         $scope.info = "";
         $scope.done = false;
         $scope.retval = "";
@@ -139,14 +139,14 @@ https://github.com/pemn/file-form
         } else {
           $scope.name = location.pathname.replace(/.*\/|\.[^.]*$/g, '');
         }
-        $scope.worker.init($scope.name);
+        $scope.bale.init($scope.name);
         // autofit the window to content
         $scope.$on($scope.name + '-init', function() {
           $scope.$digest();
           resizeTo(outerWidth, document.documentElement.offsetHeight + outerHeight - innerHeight);
         });
         $scope.submitForm = function(){
-          $scope.retval = $scope.worker.main();
+          $scope.retval = $scope.bale.main();
           $scope.done = Boolean($scope.retval);
         };
       });
@@ -168,35 +168,35 @@ https://github.com/pemn/file-form
               <th><input type="submit" class="btn btn-success form-control"></th>
             </tr>
           </thead>
-          <tr ng-repeat="(k, v) in worker.meta" ng-switch="v[2]">
+          <tr ng-repeat="(k, v) in bale.meta" ng-switch="v[2]">
             <td>{{v[1]}}</td>
             <td ng-switch-when="link">
-              <input ng-model="worker.data[k]" class="form-control" type="text" list="list{{k}}" ng-focus="data[k] = undefined">
+              <input ng-model="bale.data[k]" class="form-control" type="text" list="list{{k}}" ng-focus="data[k] = undefined">
               <datalist id="list{{k}}">
-                <option ng-repeat="item in worker.meta[k][0] | filter : data[k-1]" ng-value="item"/>
+                <option ng-repeat="item in bale.meta[k][0] | filter : data[k-1]" ng-value="item"/>
               </datalist>
             </td>
             <td ng-switch-when="user">
-              <input ng-model="worker.data[k]" class="form-control" type="text" ng-init="user_info(worker.data, k, 'DisplayName')">
+              <input ng-model="bale.data[k]" class="form-control" type="text" ng-init="user_info(bale.data, k, 'DisplayName')">
             </td>
             <td ng-switch-when="checkbox">
-              <input ng-model="worker.data[k]" class="form-control" type="checkbox">
+              <input ng-model="bale.data[k]" class="form-control" type="checkbox">
             </td>
             <td ng-switch-when="date">
-              <input ng-model="worker.data[k]" class="form-control" type="date">
+              <input ng-model="bale.data[k]" class="form-control" type="date">
             </td>
             <td ng-switch-when="files">
-              <input ng-model="worker.data[k]" class="form-control btn btn-default" type="button" ngf-select="" ngf-accept="meta[k][0]" multiple value="Select Files">
+              <input ng-model="bale.data[k]" class="form-control btn btn-default" type="button" ngf-select="" ngf-accept="meta[k][0]" multiple value="Select Files">
             </td>
             <td ng-switch-default>
-              <input ng-model="worker.data[k]" class="form-control" type="text" list="list{{k}}" ng-focus="data[k] = undefined">
+              <input ng-model="bale.data[k]" class="form-control" type="text" list="list{{k}}" ng-focus="data[k] = undefined">
               <datalist id="list{{k}}">
-                <option ng-repeat="item in worker.meta[k][0]" ng-value="item"/>
+                <option ng-repeat="item in bale.meta[k][0]" ng-value="item"/>
               </datalist>
             </td>
             <td>
               <ul ng-switch-when="files">
-                <li ng-repeat="item in worker.data[k]">{{item.name}}</li>
+                <li ng-repeat="item in bale.data[k]">{{item.name}}</li>
               </ul>
             </td>
           </tr>
