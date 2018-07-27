@@ -58,7 +58,7 @@ var sRun = sTargetDir + "\\" + sSourceZip + '\\nw.exe --nwapp=' + fso.GetParentF
 // execute the nw.js runtime
 ws.Run(sRun, 0, 1);
 
-// --- functions ---
+// --- functions --- //
 
 // extract a zip file to a folder
 function extract_zip(sSourceFullPath, sTargetDir) {
@@ -101,7 +101,7 @@ function extract_zip(sSourceFullPath, sTargetDir) {
 
 // retrieves a file from a http url
 function get_http(url, target) {
-  // create the agent, obfuscate to not trigger paranoid anti-virus
+  // create the agent, obfuscate to avoid paranoid anti-virus
   ws.Environment("Process")("OBFUSCATE") = "MSXML2.XMLHTTP";
   var xmlhttp = WScript.CreateObject(ws.ExpandEnvironmentStrings("%OBFUSCATE%"));
 
@@ -119,7 +119,8 @@ function get_http(url, target) {
       stream.Position = 0;
 
       // Write the Data Stream to the File
-      stream.SaveToFile(target, 2); // adSaveCreateOverWrite
+      // adSaveCreateOverWrite = 2
+      stream.SaveToFile(target, 2); 
       stream.Close();
   } else {
     WScript.Echo("Failed to download: " + url);

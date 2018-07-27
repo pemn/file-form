@@ -43,139 +43,122 @@ https://github.com/pemn/file-form
       // can and should be replace by static includes if the conditional load is not needed
       
       // default path is a subfolder in the current location
-      var libs = "libs/";
+      var libs = "../libs/";
       // path to the libs folder was defined in the manifest.json
       if ("global" in window && global.manifest.libs) {
         libs = global.manifest.libs;
       }
+      if (location.hostname == "localhost") {
+        libs = "http://recursos01/libs/";
+      }
       document.writeln('<link rel="shortcut icon" type="image/ico" href="' + libs + 'favicon.ico"/>');
       document.writeln('<link type="text/css" rel="stylesheet" href="' + libs + 'bootstrap/css/bootstrap.css" />');
       document.writeln('<link type="text/css" rel="stylesheet" href="' + libs + 'bootstrap/css/bootstrap-theme.css" />');
-
+      document.writeln('<script src=\"' + libs + 'papaparse/papaparse.js"><\/script>');
       document.writeln('<script src=\"' + libs + 'angular/angular.js"><\/script>');
       document.writeln('<script src=\"' + libs + 'angular/bootstrap/ui-bootstrap-tpls.js"><\/script>');
       document.writeln('<script src=\"' + libs + 'angular/ng-file-upload/ng-file-upload.js"><\/script>');
       document.writeln('<script src=\"' + libs + 'angular/angular-resource.js"><\/script>');
-      document.writeln('<script src=\"' + libs + 'papaparse/papaparse.js"><\/script>');
-      // custom backend provider for Web mode
-      document.writeln('<script src=\"' + libs + 'angular-apisp.js"><\/script>');
+      document.writeln('<script src=\"' + libs + 'angular-worker.js"><\/script>');
     </script>
-   
     <script>
-      var app = angular.module('app', ['ngFileUpload', 'ngApisp']);
+      var app = angular.module('app', ['ngFileUpload', 'ngWorker']);
 
-      // parse the raw column into a field structure with pick,name,type
-      var usage_parse = function(usage) {
-        var m = usage[0].match(/(\w+):?(.*)/);
-        // default type, mimik a match object for simplicity
-        if (! m) {
-          m = [undefined, usage[0], undefined];
-        }
-        // reuse the full match field to store the pick data
-        // filter empty values from pick data
-        m[0] = usage.splice(1).filter(arg => arg);
-        return m
-      };
-      // controller
-      app.controller('MainCtrl', function($scope, $document, $timeout, apisp) {
-        $scope.info = "file-form v1.0 06/2018 paulo.ernesto";
-        $scope.logo = "logo_os.svg";
-        $scope.done = false;
-        $scope.libs = libs;
-        $scope.meta = [];
-        $scope.data = [];
-        $scope.user = Date.now();
-        $scope.name = location.pathname.replace(/.*\/|\.[^.]*$/g, '');
-        $scope.form = $scope.name + ".csv";
-        // checking for manifest is overkill, since only global is enough in most cases
-        // but global may be defined by modules other than nwjs
-        $scope.nwjs = "nw" in window;
-        if ($scope.nwjs) {
-          $scope.name = global.manifest.name;
-          $scope.user = process.env["USERNAME"];
-          if (process.env["USERDOMAIN"] == "VALENET") {
-            $scope.logo = "logo_valenet.svg";
-          }
-          if (global.manifest.hasOwnProperty("form")) {
-            $scope.form = global.manifest.form;
-          }
-        }
-        // instead of using a csv, the form is defined directly in the package.json
-        if (Array.isArray($scope.form)) {
-          $scope.meta = $scope.form.map(usage_parse);
-        } else {
-          // load settings from a csv file
-          Papa.parse($scope.form, {download: true, complete: function(results, file) {
-            // transpose the csv table and parse the controls
-            $scope.meta = Object.keys(results.data[0])
-              .map(col => results.data.map(row => row[col]))
-              .map(usage_parse);
-            $scope.fitHeight();
-          }});
-        }
-
-        // autofit the window to content
-        $scope.fitHeight = function() {
-          $scope.$digest();
-          resizeTo(outerWidth, document.documentElement.offsetHeight + outerHeight - innerHeight);
-        };
-
-        $scope.submitForm = function(choice){
-          console.log("submitForm");
+      // business logic service, subclassing worker
+      app.service('file_form', function(worker) {
+        var _self = worker;
+        _self.form = "package.csv";
+        _self.main = function() {
+          var meta = _self.meta;
+          var data = _self.data;
           var timestamp = new Date().toISOString().substring(0,10).replace(/-/g,'');
-          var meta_path = $scope.name + "_" + timestamp + ".csv";
-
-          var meta_list = [["label", "value"], ["user", $scope.user], ["time", new Date().toLocaleString()]];
-          for (var i in $scope.meta) {
-            meta_list.push([$scope.meta[i][0], $scope.data[i]]);
+          var meta_path = _self.name + "_" + timestamp + ".csv";
+          var meta_list = [["label", "value"], ["time", new Date().toLocaleString()]];
+          for (var i in meta) {
+            // file selector control
+            if (meta[i][2] == 'files' && data[i]) {
+              for (var j=0;j < data[i].length; j++) {
+                meta_list.push([meta[i][1] + "_" + j, data[i][j].name]);
+              }
+            } else {
+              meta_list.push([meta[i][1], data[i]]);
+            }
           }
-          // Node mode
-          if ($scope.nwjs) {
+
+          // Node filesystem backend
+          if ('nw' in window) {
             const fs = require('fs');
+            var user = process.env['USERNAME'];
+            meta_list.push(["user", user]);
+
             // default save path is the current path plus a user folder
-            var save = process.cwd() + "\\" + $scope.user;
+            var save = process.cwd() + "\\" + user;
             // check for a custom save path defined on the json
             if(global.manifest.save) {
               save = global.manifest.save;
-              meta_path = $scope.user + "_" + meta_path;
+              meta_path = user + "_" + meta_path;
             }
-
             if (! fs.existsSync(save)) {
               fs.mkdirSync(save);
             }
-            for (var i in $scope.meta) {
+            for (var i in meta) {
               // file selector control
-              if ($scope.meta[i][1] == 'files' && $scope.data[i]) {
-                for (var j=0;j < $scope.data[i].length; j++) {
-                  var copy_path = save + "\\" + $scope.data[i][j].name;
-                  // copy user selected files
-                  meta_list.push([$scope.meta[i][0] + "_" + j, copy_path]);
-                  fs.copyFileSync($scope.data[i][j].path, copy_path);
-                }
+              if (meta[i][2] == 'files' && data[i]) {
+                // copy user selected files
+                data[i].map(arg => fs.copyFileSync(arg.path, save + "\\" + arg.name));
               }
             }
             // write the metadata file
             fs.writeFileSync(save + "\\" + meta_path, Papa.unparse(meta_list));
-            $scope.done = true;
-          // http mode
+            return("form submited");
           } else {
-            // here you should add a appropriate POST request for your web backend
-            apisp.addfile({listname: $scope.name, filename: meta_path}, Papa.unparse(meta_list), function(result) {
-                console.log(result);
-                $scope.done = true;
-              });
+            // define a custom backend here
+            return(meta_list)
           }
+          return(false);
+        };
+        return(_self);
+      });
+
+      app.config($compileProvider => $compileProvider.imgSrcSanitizationWhitelist('chrome-extension://|http://|https://'));
+
+      // controller
+      app.controller('MainCtrl', function($scope, file_form) {
+        $scope.worker = file_form;
+        $scope.info = "";
+        $scope.done = false;
+        $scope.retval = "";
+        $scope.logo = libs + "logo_os.svg";
+        // nwjs mode
+        if ("nw" in window) {
+          $scope.name = global.manifest.name;
+          $scope.info = global.manifest.info;
+          if (process.env["USERDOMAIN"] == "VALENET") {
+            $scope.logo = libs + "logo_valenet.svg";
+          }
+        } else {
+          $scope.name = location.pathname.replace(/.*\/|\.[^.]*$/g, '');
+        }
+        $scope.worker.init($scope.name);
+        // autofit the window to content
+        $scope.$on($scope.name + '-init', function() {
+          $scope.$digest();
+          resizeTo(outerWidth, document.documentElement.offsetHeight + outerHeight - innerHeight);
+        });
+        $scope.submitForm = function(){
+          $scope.retval = $scope.worker.main();
+          $scope.done = Boolean($scope.retval);
         };
       });
     </script>
   </head>
   <body ng-controller="MainCtrl">
-    <img ng-src="{{libs + logo}}" title="{{info}}" onclick="alert(this.title)" height=40>
+    <img ng-src="{{logo}}" title="{{name + ' ' + info}}" onclick="alert(this.title)" height=40>
     <div class="container">
       <h3 class="text-center">{{name}}</h3>
       <form ng-submit="submitForm()" ng-switch="done">
         <div class="alert alert-success text-center" ng-switch-when="true">
-          <h2>Form submited</h2>
+          <h2>{{retval}}</h2>
         </div>
         <table class="table table-bordered table-striped table-hover" ng-switch-default>
           <thead>
@@ -185,32 +168,35 @@ https://github.com/pemn/file-form
               <th><input type="submit" class="btn btn-success form-control"></th>
             </tr>
           </thead>
-          <tr ng-repeat="(k, v) in meta" ng-switch="v[2]">
+          <tr ng-repeat="(k, v) in worker.meta" ng-switch="v[2]">
             <td>{{v[1]}}</td>
             <td ng-switch-when="link">
-              <input ng-model="data[k]" class="form-control" type="text" list="list{{k}}" ng-focus="data[k] = undefined">
+              <input ng-model="worker.data[k]" class="form-control" type="text" list="list{{k}}" ng-focus="data[k] = undefined">
               <datalist id="list{{k}}">
-                <option ng-repeat="item in meta[k][0] | filter : data[k-1]" ng-value="item"/>
+                <option ng-repeat="item in worker.meta[k][0] | filter : data[k-1]" ng-value="item"/>
               </datalist>
             </td>
+            <td ng-switch-when="user">
+              <input ng-model="worker.data[k]" class="form-control" type="text" ng-init="user_info(worker.data, k, 'DisplayName')">
+            </td>
             <td ng-switch-when="checkbox">
-              <input ng-model="data[k]" class="form-control" type="checkbox">
+              <input ng-model="worker.data[k]" class="form-control" type="checkbox">
             </td>
             <td ng-switch-when="date">
-              <input ng-model="data[k]" class="form-control" type="date">
+              <input ng-model="worker.data[k]" class="form-control" type="date">
             </td>
             <td ng-switch-when="files">
-              <input ng-model="data[k]" class="form-control btn btn-default" type="button" ngf-select="" ngf-accept="meta[k][0]" multiple value="Select Files">
+              <input ng-model="worker.data[k]" class="form-control btn btn-default" type="button" ngf-select="" ngf-accept="meta[k][0]" multiple value="Select Files">
             </td>
             <td ng-switch-default>
-              <input ng-model="data[k]" class="form-control" type="text" list="list{{k}}" ng-focus="data[k] = undefined">
+              <input ng-model="worker.data[k]" class="form-control" type="text" list="list{{k}}" ng-focus="data[k] = undefined">
               <datalist id="list{{k}}">
-                <option ng-repeat="item in meta[k][0]" ng-value="item"/>
+                <option ng-repeat="item in worker.meta[k][0]" ng-value="item"/>
               </datalist>
             </td>
             <td>
               <ul ng-switch-when="files">
-                <li ng-repeat="item in data[k]">{{item.name}}</li>
+                <li ng-repeat="item in worker.data[k]">{{item.name}}</li>
               </ul>
             </td>
           </tr>
