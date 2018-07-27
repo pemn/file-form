@@ -48,9 +48,6 @@ https://github.com/pemn/file-form
       if ("global" in window && global.manifest.libs) {
         libs = global.manifest.libs;
       }
-      if (location.hostname == "localhost") {
-        libs = "http://recursos01/libs/";
-      }
       document.writeln('<link rel="shortcut icon" type="image/ico" href="' + libs + 'favicon.ico"/>');
       document.writeln('<link type="text/css" rel="stylesheet" href="' + libs + 'bootstrap/css/bootstrap.css" />');
       document.writeln('<link type="text/css" rel="stylesheet" href="' + libs + 'bootstrap/css/bootstrap-theme.css" />');
@@ -171,7 +168,7 @@ https://github.com/pemn/file-form
           <tr ng-repeat="(k, v) in bale.meta" ng-switch="v[2]">
             <td>{{v[1]}}</td>
             <td ng-switch-when="link">
-              <input ng-model="bale.data[k]" class="form-control" type="text" list="list{{k}}" ng-focus="data[k] = undefined" />
+              <input ng-model="bale.data[k]" class="form-control" type="text" list="list{{k}}" ng-focus="data[k] = undefined">
               <datalist id="list{{k}}">
                 <option ng-repeat="item in bale.meta[k][0] | filter : data[k-1]" ng-value="item"/>
               </datalist>
