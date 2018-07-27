@@ -2,7 +2,7 @@
 
 ## Description
 This system is a standalone, data-driven, way to fill forms and copy files without a http backend. Uses standard CIFS/SMB shares in the local area network (A.k.a.: Windows Shares).
-The client is a html5 single page application using the angular framework.  
+The client is a html5 single page application using the angular framework. This form system is in fact a example of business logic bundled as a "pack" in a modular app system.  
 There are two modes of operation:  
  - Executable mode. A custom WSH script calls a standalone nw.js runtime. This mode supports the copying of local files.
  - Http mode. Hosted on a web server with a custom REST backend (PHP, Sharepoint, WP, etc).
