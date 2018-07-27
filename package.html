@@ -170,8 +170,8 @@ https://github.com/pemn/file-form
           </thead>
           <tr ng-repeat="(k, v) in bale.meta" ng-switch="v[2]">
             <td>{{v[1]}}</td>
-            <td ng-switch-when="link">
-              <input ng-model="bale.data[k]" class="form-control" type="text" list="list{{k}}" ng-focus="data[k] = undefined">
+            <td ng-switch-when="link"/>
+              <input ng-model="bale.data[k]" class="form-control" type="text" list="list{{k}}" ng-focus="data[k] = undefined"/>
               <datalist id="list{{k}}">
                 <option ng-repeat="item in bale.meta[k][0] | filter : data[k-1]" ng-value="item"/>
               </datalist>
