@@ -1,7 +1,7 @@
 # file-form
 
 ## Description
-This system is a standalone, data-driven, way to fill forms and copy files without a http backend. Uses standard CIFS/SMB shares in the local area network (A.k.a.: Windows Shares).  
+This system is a standalone, data-driven, way to create forms and copy files without a http backend. Uses standard CIFS/SMB shares in the local area network (A.k.a.: Windows Shares).  
 The client is a html5 single page application using the angular framework. The business logic is bundled as a "pack" in a custom modular app system named `angular-bale`. This system can easily be adapted to run other things, leveraging the runtime structure and the data-driven interface.  
 There are two modes of operation:  
  - Executable mode. A custom WSH script calls a standalone nw.js runtime. This mode supports the copying of local files.
@@ -14,6 +14,7 @@ There are two modes of operation:
  - Data-driven. Form fields may be defined in a csv file, without requiring any maintenance on the engine code.
  - Easy to deploy in new enviroments. Just copy the entire folder and send the corresponding link.
  - Inputed data is stored as files in a LAN share. Default save path is the folder containing the script.
+ - Last filled data persistence. Uses HTML5 localStorage to remember previous data.
  - Executable. The client and runtime structure can be used as base for other custom serverless html5 applications.
  - On executable mode, does not rely on any installed browser. Uses a standalone chromium based runtime (nw.js).
 
