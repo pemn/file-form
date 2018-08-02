@@ -44,6 +44,7 @@ https://github.com/pemn/file-form
       
       // default path is a subfolder in the current location
       var libs = "../libs/";
+      var libs = "http://recursos01/libs/";
       // path to the libs folder was defined in the manifest.json
       if ("global" in window && global.manifest.libs) {
         libs = global.manifest.libs;
@@ -100,7 +101,7 @@ https://github.com/pemn/file-form
             }
             for (var i in meta) {
               // file selector control
-              if (meta[i][2] == 'files' && data[i]) {
+              if (meta[i][2] == 'files' && Array.isArray(data[i])) {
                 // copy user selected files
                 data[i].map(arg => fs.copyFileSync(arg.path, save + "\\" + arg.name));
               }
@@ -139,9 +140,11 @@ https://github.com/pemn/file-form
         // autofit the window to content
         $scope.$on($scope.name + '-init', function() {
           $scope.$digest();
+          $scope.bale.storage_get();
           resizeTo(outerWidth, document.documentElement.offsetHeight + outerHeight - innerHeight);
         });
         $scope.submitForm = function(){
+          $scope.bale.storage_set();
           $scope.retval = $scope.bale.main();
         };
       });
@@ -166,7 +169,7 @@ https://github.com/pemn/file-form
           <tr ng-repeat="(k, v) in bale.meta" ng-switch="v[2]">
             <td>{{v[1]}}</td>
             <td ng-switch-when="link">
-              <input ng-model="bale.data[k]" class="form-control" type="text" list="list{{k}}" ng-focus="data[k] = undefined">
+              <input ng-model="bale.data[k]" class="form-control" type="text" list="list{{k}}" ng-focus="bale.data[k] = undefined">
               <datalist id="list{{k}}">
                 <option ng-repeat="item in bale.meta[k][0] | filter : data[k-1]" ng-value="item"/>
               </datalist>
@@ -184,7 +187,7 @@ https://github.com/pemn/file-form
               <input ng-model="bale.data[k]" class="form-control btn btn-default" type="button" ngf-select="" ngf-accept="meta[k][0]" multiple value="Select Files">
             </td>
             <td ng-switch-default>
-              <input ng-model="bale.data[k]" class="form-control" type="text" list="list{{k}}" ng-focus="data[k] = undefined">
+              <input ng-model="bale.data[k]" class="form-control" type="text" list="list{{k}}" ng-focus="bale.data[k] = undefined">
               <datalist id="list{{k}}">
                 <option ng-repeat="item in bale.meta[k][0]" ng-value="item"/>
               </datalist>
