@@ -40,10 +40,12 @@ https://github.com/pemn/file-form
     </style>
     <script>
       // conditional load of libraries to allow nwjs specify a remote repository
-      // can and should be replace by static includes if the conditional load is not needed
+      // can and should be replaced by static includes if the conditional load is not needed
       
       // default path is a subfolder in the current location
       var libs = "../libs/";
+      // The next line only makes sense in the original creator debug enviroment.
+      var libs = "http://recursos01/libs/";
       // path to the libs folder was defined in the manifest.json
       if ("global" in window && global.manifest.libs) {
         libs = global.manifest.libs;
@@ -62,8 +64,9 @@ https://github.com/pemn/file-form
       var app = angular.module('app', ['ngFileUpload', 'ngBale']);
 
       // business logic service, subclassing bale
-      app.service('file_form', function(bale) {
+      app.service('work', function(bale) {
         var _self = bale;
+        // _self.form = [["input1"], ["input2","a","b","c"], ["input3:date"], ["input4:checkbox"], ["input5:link", "false-1","false-2", "true-1","true-2"]];
         _self.form = "package.csv";
         _self.main = function() {
           var meta = _self.meta;
@@ -120,8 +123,8 @@ https://github.com/pemn/file-form
       app.config($compileProvider => $compileProvider.imgSrcSanitizationWhitelist('chrome-extension://|http://|https://'));
 
       // controller
-      app.controller('MainCtrl', function($scope, file_form) {
-        $scope.bale = file_form;
+      app.controller('MainCtrl', function($scope, work) {
+        $scope.bale = work;
         $scope.info = "";
         $scope.logo = libs + "logo_os.svg";
         $scope.retval = undefined;
@@ -170,7 +173,7 @@ https://github.com/pemn/file-form
             <td ng-switch-when="link">
               <input ng-model="bale.data[k]" class="form-control" type="text" list="list{{k}}" ng-focus="bale.data[k] = undefined">
               <datalist id="list{{k}}">
-                <option ng-repeat="item in bale.meta[k][0] | filter : data[k-1]" ng-value="item"/>
+                <option ng-repeat="item in bale.meta[k][0] | filter : bale.data[k-1]" ng-value="item"/>
               </datalist>
             </td>
             <td ng-switch-when="user">
