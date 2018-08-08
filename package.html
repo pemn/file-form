@@ -44,8 +44,7 @@ https://github.com/pemn/file-form
       
       // default path is a subfolder in the current location
       var libs = "../libs/";
-      // The next line only makes sense in the original creator debug enviroment.
-      var libs = "http://recursos01/libs/";
+
       // path to the libs folder was defined in the manifest.json
       if ("global" in window && global.manifest.libs) {
         libs = global.manifest.libs;
@@ -186,7 +185,7 @@ https://github.com/pemn/file-form
               <input ng-model="bale.data[k]" class="form-control" type="date">
             </td>
             <td ng-switch-when="files">
-              <input ng-model="bale.data[k]" class="form-control btn btn-default" type="button" ngf-select="" ngf-accept="meta[k][0]" multiple value="Select Files">
+              <input ng-model="bale.data[k]" class="form-control btn btn-default" type="button" ngf-select="" ngf-accept="bale.meta[k][0]" multiple value="Select Files">
             </td>
             <td ng-switch-default>
               <input ng-model="bale.data[k]" class="form-control" type="text" list="list{{k}}" ng-focus="bale.data[k] = undefined">
