@@ -53,23 +53,23 @@ Supported control types are:
  - date
    - HTML5 date control
  - files
-   - Multiple local file system selection. Behavior is very different from standard `<input type="file">`.
+   - Multiple local file system selection. Behavior is very different from standard `<input type="file">`. May use file extension filters.
  - link
    - Similar with text, but allows linked options filtered by the value of the previous control. Ex.: One control to select a country then another control to select one of its cities.
 
 ## CSV example
-| title | date:date | check:checkbox | attachment:files | color | continent | country:link |
-| --- | --- | --- | --- | --- | --- | --- |
-| | | | | red | America | America-US |
-| | | | | green | Australia | America-Canada |
-| | | | | blue | Africa | Africa-SA |
-| | | | | | Asia | Asia-China |
-| | | | | | Europe | Asia-Japan |
-| | | | | | | Asia-SK |
-| | | | | | | Asia-NK |
-| | | | | | | Australia-Australia |
-| | | | | | | Europe-Germany |
-| | | | | | | Europe-France |
+| title | date:date | check:checkbox | attachment:files | report:files | color | continent | country:link |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| | | | | .pdf,.txt | red | America | America-US |
+| | | | | | green | Australia | America-Canada |
+| | | | | | blue | Africa | Africa-SA |
+| | | | | | | Asia | Asia-China |
+| | | | | | | Europe | Asia-Japan |
+| | | | | | | | Asia-SK |
+| | | | | | | | Asia-NK |
+| | | | | | | | Australia-Australia |
+| | | | | | | | Europe-Germany |
+| | | | | Z | | Europe-France |
 
 ## License
 Apache 2.0
