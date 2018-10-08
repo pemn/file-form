@@ -69,7 +69,7 @@ Supported control types are:
 | | | | | | | | Asia-NK |
 | | | | | | | | Australia-Australia |
 | | | | | | | | Europe-Germany |
-| | | | | Z | | Europe-France |
+| | | | | | | | Europe-France |
 
 ## License
 Apache 2.0
